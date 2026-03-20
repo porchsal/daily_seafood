@@ -49,7 +49,7 @@ SKIP_PREFIXES = (
 
 CSV_FIELDS = [
     "cust_code", "customer_name", "item_code", "item_description",
-    "invoice_date", "invoice_no", "quantity", "price",
+    "invoice_date", "invoice_no", "quantity", "price", "amount",
     "cost", "profit", "margin", "source_file",
 ]
 
@@ -79,6 +79,7 @@ def parse_line(line: str, source_file: str) -> dict:
         "invoice_no":       line[COL_INVOICE_NO].strip(),
         "quantity":         parse_num(line[COL_QUANTITY]),
         "price":            parse_num(line[COL_PRICE]),
+        "amount":           parse_num(line[COL_AMOUNT]),
         "cost":             parse_num(line[COL_COST]),
         "profit":           parse_num(line[COL_PROFIT]),
         "margin":           parse_num(line[COL_MARGIN]),

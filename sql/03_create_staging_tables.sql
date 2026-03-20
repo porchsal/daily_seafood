@@ -8,6 +8,7 @@ CREATE TABLE staging.customer_item_profitability (
     invoice_no TEXT,
     quantity NUMERIC(18,4),
     price NUMERIC(18,4),
+    amount NUMERIC(18,4),
     cost NUMERIC(18,4),
     profit NUMERIC(18,4),
     margin NUMERIC(18,4),

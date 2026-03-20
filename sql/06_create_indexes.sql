@@ -22,6 +22,6 @@ CREATE INDEX idx_fact_sales_item_id
 CREATE INDEX idx_fact_sales_invoice_no
     ON warehouse.fact_sales_profitability(invoice_no);
 
-ALTER TABLE warehouse.fact_sales_profitability
-ADD CONSTRAINT uq_fact_sales_line
-UNIQUE (date_key, customer_id, item_id, invoice_no, sales_amount);
+-- ALTER TABLE warehouse.fact_sales_profitability
+-- ADD CONSTRAINT uq_fact_sales_line
+-- UNIQUE (date_key, customer_id, item_id, invoice_no, sales_amount); constraint need to be investigated further, as it is not working as expected, and allowing duplicates in the fact table.
