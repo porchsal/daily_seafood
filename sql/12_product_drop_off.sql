@@ -33,6 +33,7 @@ important_customers AS (
     WHERE total_90d >= 3000
 )
 SELECT
+    c.cust_code,
     c.customer_name,
     i.item_description,
     lp.last_purchase_date,

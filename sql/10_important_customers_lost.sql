@@ -22,6 +22,7 @@ last_order AS (
     GROUP BY f.customer_id
 )
 SELECT
+    c.cust_code,
     c.customer_name,
     lo.last_order_date,
     CURRENT_DATE - lo.last_order_date AS days_since_last_order,

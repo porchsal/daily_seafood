@@ -69,5 +69,5 @@ INNER JOIN warehouse.dim_customer dc
     ON dc.cust_code = s.cust_code
 INNER JOIN warehouse.dim_item di
     ON di.item_code = s.item_code
-WHERE s.invoice_date IS NOT NULL
-ON CONFLICT DO NOTHING;
+WHERE s.invoice_date IS NOT NULL;
+-- ON CONFLICT DO NOTHING; --constraint not working, need to investigate further
