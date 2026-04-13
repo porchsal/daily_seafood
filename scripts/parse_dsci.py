@@ -13,12 +13,13 @@ from __future__ import annotations
 
 import csv
 import sys
+import shutil
 from datetime import datetime
 from decimal import Decimal
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
-# Column slices — derived from the report header line positions
+# Column slices
 # ---------------------------------------------------------------------------
 COL_CUST_CODE        = slice(0,   11)
 COL_CUSTOMER_NAME    = slice(11,  53)
@@ -49,8 +50,8 @@ SKIP_PREFIXES = (
 
 CSV_FIELDS = [
     "cust_code", "customer_name", "item_code", "item_description",
-    "invoice_date", "invoice_no", "quantity", "price", "amount",
-    "cost", "profit", "margin", "source_file",
+    "invoice_date", "invoice_no", "quantity", "price",
+    "amount", "cost", "profit", "margin", "source_file",
 ]
 
 
@@ -60,7 +61,6 @@ def should_skip(line: str) -> bool:
 
 
 def parse_date(value: str) -> str:
-    """'Mar  9, 2026' or 'Mar 14, 2026' → '2026-03-09'"""
     return datetime.strptime(" ".join(value.split()), "%b %d, %Y").date().isoformat()
 
 
@@ -87,7 +87,7 @@ def parse_line(line: str, source_file: str) -> dict:
     }
 
 
-def parse_dsci(input_path: Path, output_path: Path) -> None:
+def process_file(input_path: Path, output_path: Path) -> None:
     rows = []
     errors = []
 
@@ -102,6 +102,7 @@ def parse_dsci(input_path: Path, output_path: Path) -> None:
                 errors.append((lineno, str(exc), line[:120]))
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
+
     with output_path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=CSV_FIELDS)
         writer.writeheader()
@@ -109,12 +110,43 @@ def parse_dsci(input_path: Path, output_path: Path) -> None:
 
     print(f"✓ Rows written : {len(rows)}")
     print(f"✗ Parse errors : {len(errors)}")
+
     if errors:
         for lineno, msg, preview in errors:
             print(f"  Line {lineno}: {msg} | {preview}")
 
 
+def main():
+    incoming_dir = Path("data/incoming")
+    processed_dir = Path("data/processed")
+    output_dir = Path("data/outgoing")
+
+    processed_dir.mkdir(parents=True, exist_ok=True)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    files = list(incoming_dir.glob("*.txt"))
+
+    if not files:
+        print("No files found in incoming folder.")
+        return
+
+    for file in files:
+        print(f"\nProcessing: {file.name}")
+
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        output_file = output_dir / f"{file.stem}_normalized_{timestamp}.csv"
+        try:
+            process_file(file, output_file)
+
+            # mover archivo a processed
+            destination = processed_dir / file.name
+            shutil.move(str(file), str(destination))
+
+            print(f"Moved to processed: {destination}")
+
+        except Exception as e:
+            print(f"Error processing {file.name}: {e}")
+
+
 if __name__ == "__main__":
-    input_path  = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("data/incoming/DSCI.txt")
-    output_path = Path(sys.argv[2]) if len(sys.argv) > 2 else Path("data/outgoing/DSCI_normalized.csv")
-    parse_dsci(input_path, output_path)
+    main()
